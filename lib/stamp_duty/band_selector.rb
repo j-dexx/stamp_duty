@@ -25,7 +25,7 @@ module StampDuty
     end
 
     def sorted_band_data
-      band_data_for_price.sort_by{ |band| band[:lower_band] }.reverse!
+      band_data_for_price.sort_by { |band| -band[:lower_bound] }
     end
 
     def band_data_for_price

@@ -1,7 +1,11 @@
 # StampDuty
 
-StampDuty is a stamp duty calculator for the UK property market.  Currently only
-for residential property, and doesn't include the extra 3% for owning multiple properties
+StampDuty is a Stamp Duty Land Tax (SDLT) calculator for residential property
+in England and Northern Ireland. It uses the standard residential rates and
+doesn't include surcharges (additional properties, non-residents) or reliefs
+(first-time buyers). Scotland (LBTT) and Wales (LTT) are not covered.
+
+Requires Ruby 3.3 or later.
 
 ## Installation
 
@@ -23,11 +27,21 @@ Or install it yourself as:
 
 ```ruby
 calc = StampDuty.for(275000)
-calc.calculate
 
-# .to_s("F") as returns a big decimal
+# returns a BigDecimal, rounded down to the whole pound as HMRC does
 calc.stamp_duty.to_s("F") # => 3750.0
 ```
+
+The price must be a non-negative, finite number (Integer, BigDecimal, Rational
+or Float). Anything else raises `ArgumentError`:
+
+```ruby
+StampDuty.for("275000") # => ArgumentError
+StampDuty.for(-1)       # => ArgumentError
+```
+
+`calc.calculate` still exists for backwards compatibility, but results are
+computed on first access so calling it is no longer necessary.
 
 You can also can get each the amount in each band
 
@@ -62,7 +76,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/jdexx/stamp_duty.
+Bug reports and pull requests are welcome on GitHub at https://github.com/j-dexx/stamp_duty.
 
 
 ## License
