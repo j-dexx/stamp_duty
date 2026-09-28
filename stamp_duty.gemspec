@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "bigdecimal", ">= 3.1", "< 5"
 
   spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "minitest", "~> 5.25"
+  spec.add_development_dependency "minitest", "~> 6.0"
   spec.add_development_dependency "simplecov", "~> 1.3"
   spec.add_development_dependency "standard", "~> 1.56"
   spec.add_development_dependency "bundler-audit", "~> 0.9"
