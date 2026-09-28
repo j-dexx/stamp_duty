@@ -3,9 +3,7 @@ require "simplecov"
 
 SimpleCov.start
 
-require "pry"
 require 'stamp_duty'
 
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'mocha/mini_test'
