@@ -1,0 +1,62 @@
+module StampDuty
+  VERSION: String
+
+  type price = Integer | Float | Rational | BigDecimal
+
+  def self.for: (price price, ?first_time_buyer: bool, ?additional_property: bool, ?non_resident: bool) -> Calculation
+
+  class Band
+    attr_reader lower_bound: Integer
+    attr_reader upper_bound: Integer?
+    attr_reader percentage_rate: Integer
+
+    def self.new: (lower_bound: Integer, upper_bound: Integer?, percentage_rate: Integer) -> Band
+
+    def decimal_percentage_rate: () -> BigDecimal
+    def taxable_amount: (BigDecimal | Integer price) -> (BigDecimal | Integer)
+    def applies_to?: (BigDecimal | Integer price) -> bool
+    def with_surcharge: (Integer percentage_points) -> Band
+    def description: () -> String
+    def with: (?lower_bound: Integer, ?upper_bound: Integer?, ?percentage_rate: Integer) -> Band
+    def to_h: () -> { lower_bound: Integer, upper_bound: Integer?, percentage_rate: Integer }
+  end
+
+  class BandAmount
+    attr_reader band: Band
+    attr_reader taxable_amount: BigDecimal | Integer
+
+    def self.new: (band: Band, taxable_amount: BigDecimal | Integer) -> BandAmount
+    def self.for: (Band band, BigDecimal | Integer price) -> BandAmount
+
+    def lower_bound: () -> Integer
+    def upper_bound: () -> Integer?
+    def percentage_rate: () -> Integer
+    def decimal_percentage_rate: () -> BigDecimal
+    def description: () -> String
+    def amount: () -> BigDecimal
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  class Calculation
+    attr_reader purchase_price: BigDecimal
+    attr_reader band_amounts: Array[BandAmount]
+    attr_reader stamp_duty: BigDecimal
+
+    def self.new: (purchase_price: BigDecimal, band_amounts: Array[BandAmount], stamp_duty: BigDecimal) -> Calculation
+    def self.build: (BigDecimal purchase_price, Array[Band] bands) -> Calculation
+
+    def calculate: () -> self
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+
+  module Rates
+    STANDARD: Array[Band]
+    FIRST_TIME_BUYER: Array[Band]
+    FIRST_TIME_BUYER_MAX_PRICE: Integer
+    SURCHARGE_MIN_PRICE: Integer
+    ADDITIONAL_PROPERTY_SURCHARGE: Integer
+    NON_RESIDENT_SURCHARGE: Integer
+
+    def self.bands_for: (BigDecimal price, first_time_buyer: bool, additional_property: bool, non_resident: bool) -> Array[Band]
+  end
+end

@@ -1,24 +1,31 @@
+# frozen_string_literal: true
+
+require "forwardable"
+
 module StampDuty
-  class BandAmount
+  # The tax due on the part of a purchase price that falls within one band.
+  BandAmount = Data.define(:band, :taxable_amount) do
     extend Forwardable
 
-    def_delegators :@band, :lower_bound, :percentage_rate, :decimal_percentage_rate, :description
-    attr_reader :price, :band
+    def_delegators :band, :lower_bound, :upper_bound, :percentage_rate, :decimal_percentage_rate, :description
 
-    def initialize(price:, band:)
-      @price = price
-      @band = band
+    def self.for(band, price)
+      new(band: band, taxable_amount: band.taxable_amount(price))
     end
 
     def amount
-      @amount ||= decimal_percentage_rate * rateable_amount
+      decimal_percentage_rate * taxable_amount
     end
 
-    private
-
-    def rateable_amount
-      @rateable_amount ||= price - lower_bound
+    def to_h
+      {
+        description: description,
+        lower_bound: lower_bound,
+        upper_bound: upper_bound,
+        percentage_rate: percentage_rate,
+        taxable_amount: taxable_amount,
+        amount: amount
+      }
     end
-
   end
 end

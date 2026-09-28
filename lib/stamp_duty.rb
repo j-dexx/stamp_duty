@@ -1,17 +1,25 @@
+# frozen_string_literal: true
+
 require "bigdecimal"
 require "bigdecimal/util"
-require "forwardable"
 require "stamp_duty/version"
 require "stamp_duty/band"
-require "stamp_duty/band_selector"
 require "stamp_duty/band_amount"
-require "stamp_duty/residential_calculator"
+require "stamp_duty/rates"
+require "stamp_duty/calculation"
 
 module StampDuty
-  def self.for(price)
+  # Calculates Stamp Duty Land Tax on a residential purchase in England or
+  # Northern Ireland.
+  def self.for(price, first_time_buyer: false, additional_property: false, non_resident: false)
     price = normalize_price(price)
-    bands = StampDuty::BandSelector.new(price).bands
-    StampDuty::ResidentialCalculator.new(price, bands)
+    bands = Rates.bands_for(
+      price,
+      first_time_buyer: boolean!(first_time_buyer, :first_time_buyer),
+      additional_property: boolean!(additional_property, :additional_property),
+      non_resident: boolean!(non_resident, :non_resident)
+    )
+    Calculation.build(price, bands)
   end
 
   def self.normalize_price(price)
@@ -23,4 +31,11 @@ module StampDuty
 
     price.is_a?(Rational) ? price.to_d(20) : price.to_d
   end
+
+  def self.boolean!(value, name)
+    return value if value == true || value == false
+
+    raise ArgumentError, "#{name} must be true or false, got #{value.inspect}"
+  end
+  private_class_method :normalize_price, :boolean!
 end
